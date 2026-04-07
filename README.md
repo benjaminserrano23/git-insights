@@ -32,6 +32,12 @@ python -m git_insights /path/to/repo
 
 # Generate HTML report
 python -m git_insights /path/to/repo --html report.html
+
+# Export JSON data
+python -m git_insights /path/to/repo --json report.json
+
+# Filter by date and author
+python -m git_insights /path/to/repo --since "2025-01-01" --author "benjamin"
 ```
 
 ## Development

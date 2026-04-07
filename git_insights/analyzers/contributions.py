@@ -1,17 +1,20 @@
 """Analyze per-author contributions from git history."""
 
 from collections import defaultdict
-from git import Repo
+from git import Repo, Commit
 import pandas as pd
 
 
-def analyze_contributions(repo: Repo) -> pd.DataFrame:
+def analyze_contributions(repo: Repo, commits: list[Commit] | None = None) -> pd.DataFrame:
     """Return a DataFrame with per-author contribution stats."""
+    if commits is None:
+        commits = list(repo.iter_commits("HEAD"))
+
     stats: dict[str, dict] = defaultdict(
         lambda: {"commits": 0, "additions": 0, "deletions": 0, "files_touched": set()}
     )
 
-    for commit in repo.iter_commits("HEAD"):
+    for commit in commits:
         author = commit.author.name or "Unknown"
         stats[author]["commits"] += 1
 

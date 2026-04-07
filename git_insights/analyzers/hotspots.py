@@ -1,16 +1,19 @@
 """Detect file hotspots — files modified most frequently."""
 
 from collections import Counter
-from git import Repo
+from git import Repo, Commit
 import pandas as pd
 
 
-def analyze_hotspots(repo: Repo, top_n: int = 20) -> pd.DataFrame:
+def analyze_hotspots(repo: Repo, commits: list[Commit] | None = None, top_n: int = 20) -> pd.DataFrame:
     """Return a DataFrame of most frequently modified files."""
+    if commits is None:
+        commits = list(repo.iter_commits("HEAD"))
+
     file_changes: Counter[str] = Counter()
     file_authors: dict[str, set[str]] = {}
 
-    for commit in repo.iter_commits("HEAD"):
+    for commit in commits:
         author = commit.author.name or "Unknown"
         try:
             if commit.parents:

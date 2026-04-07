@@ -1,5 +1,7 @@
 # Git Insights
 
+[![CI](https://github.com/benjaminserrano23/git-insights/actions/workflows/ci.yml/badge.svg)](https://github.com/benjaminserrano23/git-insights/actions/workflows/ci.yml)
+
 CLI tool + HTML report that analyzes the history of any git repository. Extracts contribution stats, file hotspots, commit activity patterns, and codebase growth over time.
 
 ## Features
@@ -10,6 +12,8 @@ CLI tool + HTML report that analyzes the history of any git repository. Extracts
 - **Codebase timeline** — cumulative lines of code over time
 - **HTML report** — self-contained file with Chart.js graphs, dark theme
 - **Console output** — Rich-formatted tables in the terminal
+- **JSON export** — machine-readable output for CI pipelines
+- **Filters** — `--since` and `--author` to narrow analysis scope
 
 ## Installation
 

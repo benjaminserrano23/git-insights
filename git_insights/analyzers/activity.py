@@ -1,18 +1,21 @@
 """Analyze commit activity patterns by hour and day of week."""
 
 from collections import defaultdict
-from git import Repo
+from git import Repo, Commit
 import pandas as pd
 
 
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 
-def analyze_activity(repo: Repo) -> pd.DataFrame:
+def analyze_activity(repo: Repo, commits: list[Commit] | None = None) -> pd.DataFrame:
     """Return a DataFrame with commit counts per (day_of_week, hour)."""
+    if commits is None:
+        commits = list(repo.iter_commits("HEAD"))
+
     heatmap: dict[tuple[int, int], int] = defaultdict(int)
 
-    for commit in repo.iter_commits("HEAD"):
+    for commit in commits:
         dt = commit.authored_datetime
         heatmap[(dt.weekday(), dt.hour)] += 1
 
@@ -31,11 +34,14 @@ def analyze_activity(repo: Repo) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def analyze_timeline(repo: Repo) -> pd.DataFrame:
+def analyze_timeline(repo: Repo, commits: list[Commit] | None = None) -> pd.DataFrame:
     """Return a DataFrame with cumulative lines of code over time."""
+    if commits is None:
+        commits = list(repo.iter_commits("HEAD"))
+
     data: list[dict] = []
 
-    for commit in repo.iter_commits("HEAD"):
+    for commit in commits:
         additions = 0
         deletions = 0
         try:
@@ -69,7 +75,6 @@ def analyze_timeline(repo: Repo) -> pd.DataFrame:
     if df.empty:
         return df
 
-    # Aggregate by date and compute cumulative size
     df = df.groupby("date").sum().sort_index().reset_index()
     df["net"] = df["additions"] - df["deletions"]
     df["cumulative_size"] = df["net"].cumsum()

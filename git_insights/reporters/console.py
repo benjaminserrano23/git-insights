@@ -9,10 +9,11 @@ from rich.panel import Panel
 
 from ..analyzers.core import AnalysisResult
 
+DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
 
 def print_report(result: AnalysisResult) -> None:
     """Print analysis results to the console."""
-    # Force UTF-8 output on Windows to support emojis
     if sys.platform == "win32":
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
     console = Console(force_terminal=True)
@@ -35,7 +36,7 @@ def print_report(result: AnalysisResult) -> None:
     console.print(f"   Last commit:  {result.last_commit_date}")
     console.print()
 
-    # Contributions table
+    # Contributions
     if not result.contributions.empty:
         table = Table(title="👥 Contributions by Author", border_style="dim")
         table.add_column("Author", style="white")
@@ -69,4 +70,26 @@ def print_report(result: AnalysisResult) -> None:
                 str(row["authors"]),
             )
         console.print(table)
+        console.print()
+
+    # Activity — top 5 most active hours
+    if not result.activity.empty:
+        active = result.activity[result.activity["commits"] > 0].sort_values(
+            "commits", ascending=False
+        ).head(5)
+        if not active.empty:
+            console.print("[bold]⏰ Most Active Hours[/bold]")
+            for _, row in active.iterrows():
+                day = row["day"]
+                hour = int(row["hour"])
+                commits = int(row["commits"])
+                console.print(f"   {day} {hour:02d}:00 — [cyan]{commits}[/cyan] commits")
+            console.print()
+
+    # Timeline — current codebase size
+    if not result.timeline.empty:
+        latest = result.timeline.iloc[-1]
+        size = int(latest["cumulative_size"])
+        console.print("[bold]📈 Codebase Size[/bold]")
+        console.print(f"   ~{size:,} lines (cumulative net)")
         console.print()

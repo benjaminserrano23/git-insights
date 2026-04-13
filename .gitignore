@@ -5,4 +5,5 @@ dist/
 build/
 .env
 *.html
+report*.json
 !git_insights/reporters/*.py
